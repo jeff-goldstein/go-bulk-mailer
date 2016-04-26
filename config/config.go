@@ -33,7 +33,7 @@ type Configuration struct {
 		} `json:"sparkpost"`
 		WorkersCount int `json:"workers_count"`
 		Worker       struct {
-			WaitForMicroSeconds  int `json:"wait_for_x_microseconds"`
+			WaitForMilliSeconds  int `json:"wait_for_x_milliseconds"`
 			AfterDispatchingMsgs int `json:"after_dispatching_y_msgs"`
 		} `json:"worker"`
 	} `json:"dispatcher"`
@@ -108,7 +108,7 @@ func LoadConfig(path string) Configuration {
 	if config.Dispatcher.WorkersCount <= 0 {
 		common.Fail("Dispater's worker count should be +ve number in config file")
 	}
-	if config.Dispatcher.Worker.WaitForMicroSeconds < 0 {
+	if config.Dispatcher.Worker.WaitForMilliSeconds < 0 {
 		common.Fail("Dispatcher's worker's wait_for_x_microseconds should be 0 or more")
 	}
 	if config.Dispatcher.Worker.AfterDispatchingMsgs < 0 {

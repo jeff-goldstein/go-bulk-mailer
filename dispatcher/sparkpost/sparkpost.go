@@ -7,6 +7,7 @@ import (
 	"sync"
 	"github.com/therahulprasad/go-bulk-mailer/logger"
 	"fmt"
+	"time"
 )
 
 func Worker(conf config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) {
@@ -22,8 +23,19 @@ func Worker(conf config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 	err := client.Init(cfg)
 	common.FailOnErr(err, "Sparkpost client could not be initiated")
 
+	// Keep a count of number of messages sent by this worker
+	numMsgSent := 0
 	// Start receiving messages from channel
 	for msg := range ch {
+		// For throttling, If WaitForMilliSeconds is a positive number the
+		if conf.Dispatcher.Worker.WaitForMilliSeconds > 0 {
+			// If number of messages sent is AfterDispatchingMsgs for this session
+			if numMsgSent > 0 && numMsgSent % conf.Dispatcher.Worker.AfterDispatchingMsgs == 0 {
+				// Wait for WaitForMilliSeconds milliseconds and then proceed
+				time.Sleep(time.Duration(conf.Dispatcher.Worker.WaitForMilliSeconds) * time.Millisecond)
+			}
+		}
+
 
 		// There must be one recipient
 		if len(msg.Recipients) == 0 {
@@ -104,6 +116,10 @@ func Worker(conf config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 		tx.Content = content
 
 		id, _, err := client.Send(tx)
+
+		if err == nil {
+			numMsgSent++
+		}
 
 		// Remove msg body before loggin
 		msg.HTML = ""
