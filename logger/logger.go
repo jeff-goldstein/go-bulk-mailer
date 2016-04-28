@@ -23,10 +23,11 @@ func Init(conf config.Configuration) {
 	}
 
 	// Open success and error file and handle error
-	fe, err = os.OpenFile(conf.Logger.FolderPath + "/" + "error.log", os.O_WRONLY|os.O_APPEND, 0666)
+	fe, err = os.OpenFile(conf.Logger.FolderPath + "/" + "error.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	common.FailOnErr(err, "Could not create/open error.log file")
 
-	fs, err = os.OpenFile(conf.Logger.FolderPath + "/" + "success.log", os.O_WRONLY|os.O_APPEND, 0666)
+	success_log_filename := config.GetSuccessLogFileName()
+	fs, err = os.OpenFile(success_log_filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	common.FailOnErr(err, "Could not create/open success.log file")
 
 
@@ -47,9 +48,10 @@ func LogOnError(err error, msg string) {
 		LogError(msg + " | " + err.Error())
 	}
 }
-
 func LogSuccess(msg string) {
-	slogger.Println(msg)
+	if config.GetIfLogSuccess() {
+		slogger.Println(msg)
+	}
 }
 func LogOnSuccess(err error, msg string) {
 	if err == nil {

@@ -3,12 +3,15 @@ package main
 import (
 	"github.com/therahulprasad/go-bulk-mailer/config"
 	"os"
-	"log"
 	"github.com/therahulprasad/go-bulk-mailer/source"
 	"github.com/therahulprasad/go-bulk-mailer/common"
 	"github.com/therahulprasad/go-bulk-mailer/dispatcher"
 	"sync"
 	"github.com/therahulprasad/go-bulk-mailer/logger"
+	"flag"
+	"fmt"
+	"bufio"
+	"log"
 )
 
 const version  = "1.0"
@@ -19,17 +22,57 @@ const version  = "1.0"
  */
 
 func main() {
-	if len(os.Args) != 2 {
-		log.Fatal("Usage: ./go-bulk-mailer config.json")
+	// Loaf fag details from command line arguments
+	noDetailsFlag := flag.String("no-details", "no-value", "Do not print details for review.")
+	configFlag := flag.String("config", "no-value", "Path of config file")
+	noWarnFlag := flag.String("no-warning", "no-value", "Do warn if same source is already used for same campaign")
+	flag.Parse()
+
+	if (*configFlag == "no-value") {
+		log.Fatal("Usage: ./go-bulk-mailer --config=/path/to/config.json")
 	}
 
-	cfp := os.Args[1]
-
 	// Load configurations
-	config := config.LoadConfig(cfp)
+	conf := config.LoadConfig(*configFlag)
+
+	// Show important details of config before beginning if user has not overwritten it
+	if (*noDetailsFlag != "true") {
+		// Print config details
+		config.PrintDetails()
+
+		// Ask user if they want to continue
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Looks Good (yes/no): ")
+		text, _ := reader.ReadString('\n')
+
+		// If user does not enter yes to confirm that details are correct. Exit.
+		if text != "yes\n" {
+			fmt.Println("No! Exiting")
+			os.Exit(1)
+		} else {
+			fmt.Println("Yes")
+		}
+	}
+
+
+	if *noWarnFlag != "true" && config.ConfirmEarlyUsage() == true {
+		fmt.Printf("Campaign \"%s\" has already been run for source \"%s\" \nAre you sure you want to proceed ? (yes/no) ", conf.Campaign.Title, config.GetSourcePathIdentifier())
+
+		/// Ask user for confirmation
+		reader := bufio.NewReader(os.Stdin)
+		text, _ := reader.ReadString('\n')
+
+		// If user does not enter yes to confirm that details are correct. Exit.
+		if text != "yes\n" {
+			fmt.Println("No! Exiting")
+			os.Exit(1)
+		} else {
+			fmt.Println("Yes")
+		}
+	}
 
 	// Initiate Loggers
-	logger.Init(config)
+	logger.Init(conf)
 
 	// Channel to send emails
 	chMail := make(chan common.Mail)
@@ -41,12 +84,12 @@ func main() {
 	// Start worker to process log file and pass it via channel
 	// This function returns immediately
 	// ITs source responsibility to close channel when work is finished
-	source.Init(config, chMail, &wg)
+	source.Init(conf, chMail, &wg)
 
 	// Dispatch emails using one of the dispatcher
 	// Start worker which receives mail messages and sends it
 	// If chMail closes, all dispatcher's workers should finish
-	dispatcher.Init(config, chMail, &wg)
+	dispatcher.Init(conf, chMail, &wg)
 
 	// Wait for all go routines (source and dispatcher's workers) to end
 	wg.Wait()

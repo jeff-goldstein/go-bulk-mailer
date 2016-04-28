@@ -28,3 +28,5 @@ func Init(config config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 		go c.Process(tpl_html, tpl_text, ch, wg)
 	}
 }
+
+

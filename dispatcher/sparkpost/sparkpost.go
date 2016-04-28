@@ -115,7 +115,7 @@ func Worker(conf config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 
 		tx.Content = content
 
-		id, _, err := client.Send(tx)
+		_, _, err := client.Send(tx)
 
 		if err == nil {
 			numMsgSent++
@@ -125,6 +125,6 @@ func Worker(conf config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 		msg.HTML = ""
 		msg.Text = ""
 		logger.LogOnError(err, "Could not send email: " + fmt.Sprintf("%s", msg))
-		logger.LogOnSuccess(err, fmt.Sprintf("%s - %s", id, emails))
+		logger.LogOnSuccess(err, fmt.Sprintf("%s", emails))
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/therahulprasad/go-bulk-mailer/common"
 	"os"
+	"fmt"
+	"strconv"
 )
 
 type Configuration struct {
@@ -46,6 +48,48 @@ type Configuration struct {
 var config Configuration
 var configLoaded bool = false
 
+// Displays loaded config details in terminal
+func PrintDetails() {
+	print("Campaign Title", config.Campaign.Title)
+	print("Campaign Subject", config.Campaign.Subject)
+	if config.Source.Use == "csv" {
+		print("Data source - CSV", config.Source.Csv.Src)
+	}
+	print("Template Source", config.Template.HTMLSrc)
+	if config.Dispatcher.Use == "sparkpost" {
+		print("Dispatcher", "sparkpost")
+	}
+	print("Log Folder", config.Logger.FolderPath)
+	print("Log Success", strconv.FormatBool(config.Logger.LogSuccess))
+}
+
+// For formatted printing
+func print(msg, val string) {
+	fmt.Println(msg + ": " + val)
+}
+
+func ConfirmEarlyUsage() bool {
+	// Check if success log filename exists
+	success_log_filename := GetSuccessLogFileName()
+	_, err := os.Stat(success_log_filename)
+	if err == nil {
+		// Success file already exists
+		return true
+	} else {
+		return false
+	}
+}
+func GetSuccessLogFileName() string {
+	campaign_title := common.LowerAlphaNumericFilter(config.Campaign.Title)
+	src_file := GetSourcePathIdentifier()
+	return config.Logger.FolderPath + "/" + campaign_title + "-" + src_file + "success.log"
+}
+func GetSourcePathIdentifier() string {
+	if config.Source.Use == "csv" {
+		return common.LowerAlphaNumericFilter(config.Source.Csv.Src)
+	}
+	return "";
+}
 func LoadConfig(path string) Configuration {
 	fc, err := os.Open(path)
 	common.FailOnErr(err, "Could not open config file")
@@ -131,4 +175,8 @@ func IsConfigLoaded() bool {
 
 func GetConfig() Configuration {
 	return config
+}
+
+func GetIfLogSuccess() bool {
+	return config.Logger.LogSuccess
 }

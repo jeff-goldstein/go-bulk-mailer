@@ -17,6 +17,7 @@ And mail user following services
 1. High throughput because of Go's concurrency model
 1. Throttle number of emails send in specific amount of time
 1. Modular structure. Its easy to add your service provider such as sendgrid.
+1. Interactive CLI mode which can be overridden to be used dynamically
 
 ## Installation
 1. 
@@ -93,11 +94,14 @@ to add new sources and services. Currently I need support for csv as source
 and mandrill as service. You are most welcome to add more services and sources.
 
 #### Todo
+1. Create test mode flag to send test email
 1. Implement support for sending attachment
+1. Daemon mode
+1. Generate sample config file
 
 #### Folder structure
-`main.go` contains bootstapping code
-`init` folder contains business logic
+`main.go` contains bootstapping code  
+`init` folder contains business logic  
 `config` folder contains configuration management  
 `source` contains logic to process email data sources  
 `dispatcher` contains service providers  
@@ -112,6 +116,8 @@ and mandrill as service. You are most welcome to add more services and sources.
 1. Detect if channel is closed and shut down workers accordingly
 
 
+
 ## Changelog
 __v0.1 beta__
 This is first version
+
