@@ -29,4 +29,10 @@ func Init(config config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 	}
 }
 
+func InitFlags() {
+	c.InitFlags()
+}
 
+func ProcessFlags() {
+	c.ProcessFlags()
+}

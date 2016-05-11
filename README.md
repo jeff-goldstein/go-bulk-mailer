@@ -18,6 +18,7 @@ And mail user following services
 1. Throttle number of emails send in specific amount of time
 1. Modular structure. Its easy to add your service provider such as sendgrid.
 1. Interactive CLI mode which can be overridden to be used dynamically
+1. Support for overriding csv.source using flag
 
 ## Installation
 1. 
@@ -29,6 +30,8 @@ And mail user following services
 1. It should create an executable of name `go-bulk-mailer`
 
 ## Usage
+For help use `./go-bulk-mailer -h`  
+To send mail, create `config.json` file and run `./go-bulk-mailer --config=config.json`
 
 #### Config
     {
@@ -100,7 +103,7 @@ You are most welcome to add more services and sources.
 1. Daemon mode
 1. Generate sample config file
 1. create go get cli just like https://github.com/sideshow/apns2
-
+1. Make config modular, each module should be responsible for loading its config 
 
 #### Folder structure
 `main.go` contains bootstapping code  
@@ -117,8 +120,6 @@ You are most welcome to add more services and sources.
 1. Worker can range over channel and send emails 
 1. Source will close channel if all the messages are processed.
 1. Detect if channel is closed and shut down workers accordingly
-
-
 
 
 ## Changelog

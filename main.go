@@ -24,6 +24,7 @@ func main() {
 	noDetailsFlag := flag.String("no-details", "no-value", "Do not print details for review.")
 	configFlag := flag.String("config", "no-value", "Path of config file")
 	noWarnFlag := flag.String("no-warning", "no-value", "Do warn if same source is already used for same campaign")
+	source.InitFlags()
 	flag.Parse()
 
 	// If --version flag is set then just display version and exit
@@ -34,6 +35,7 @@ func main() {
 		fmt.Println("Version: " + version)
 		os.Exit(0)
 	}
+	source.ProcessFlags()
 
 	if (*configFlag == "no-value") {
 		log.Fatal("Usage: ./go-bulk-mailer --config=/path/to/config.json")

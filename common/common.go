@@ -4,6 +4,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"os"
 )
 
 func FailOnErr(err error, msg string) {
@@ -21,4 +22,9 @@ func LowerAlphaNumericFilter(src string) string {
 	reg, _ := regexp.Compile("[^a-zA-Z0-9]")
 	safe := reg.ReplaceAllString(src, "")
 	return strings.ToLower(safe)
+}
+
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

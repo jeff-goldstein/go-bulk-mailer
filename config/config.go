@@ -47,6 +47,7 @@ type Configuration struct {
 
 var config Configuration
 var configLoaded bool = false
+var overrideCsvSrc string = ""
 
 // Displays loaded config details in terminal
 func PrintDetails() {
@@ -133,6 +134,11 @@ func LoadConfig(path string) Configuration {
 
 	// If configuration has CSV source
 	if config.Source.Use == "csv" {
+		// Check if CSV is overridden
+		if overrideCsvSrc != "" {
+			config.Source.Csv.Src = overrideCsvSrc
+		}
+
 		// One of the variable must be email
 		if len(config.Source.Csv.Variables) > 0 {
 			emailFound := false
@@ -146,6 +152,11 @@ func LoadConfig(path string) Configuration {
 			}
 		} else {
 			common.Fail("There must be one variable called email")
+		}
+
+		// Source path must exists
+		if !common.FileExists(config.Source.Csv.Src) {
+			common.Fail("CSV source file does not exists or is not accessible: " + config.Source.Csv.Src)
 		}
 	}
 
@@ -179,4 +190,12 @@ func GetConfig() Configuration {
 
 func GetIfLogSuccess() bool {
 	return config.Logger.LogSuccess
+}
+
+func OverrideCsvSrc(csvSrc string) {
+	if common.FileExists(csvSrc) {
+		overrideCsvSrc = csvSrc
+	} else {
+		common.Fail("CSV source file does not exists or is not accessible.")
+	}
 }

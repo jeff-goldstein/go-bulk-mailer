@@ -10,7 +10,10 @@ import (
 	"sync"
 	"github.com/therahulprasad/go-bulk-mailer/logger"
 	"fmt"
+	"flag"
 )
+
+var overriddenCsvSrc string = ""
 
 func Process(tpl_h, tpl_t string, ch chan common.Mail, wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -18,7 +21,14 @@ func Process(tpl_h, tpl_t string, ch chan common.Mail, wg *sync.WaitGroup) {
 	config := config.GetConfig()
 
 	// Load file from config
-	fp, err := os.Open(config.Source.Csv.Src)
+	csvSrc := ""
+	if overriddenCsvSrc == "" {
+		csvSrc = config.Source.Csv.Src
+	} else {
+		csvSrc = overriddenCsvSrc
+	}
+
+	fp, err := os.Open(csvSrc)
 	common.FailOnErr(err, "Error while reading source file")
 
 	// Process file as csv
@@ -107,4 +117,16 @@ func Process(tpl_h, tpl_t string, ch chan common.Mail, wg *sync.WaitGroup) {
 		ch <- m
 	}
 	close(ch)
+}
+
+var csvSourceFlag *string
+func InitFlags() {
+	csvSourceFlag = flag.String("csv.source", "no-value", "Override csv source file")
+}
+
+func ProcessFlags() {
+	// If csv source is provided
+	if csvSourceFlag != nil && *csvSourceFlag != "no-value" {
+		config.OverrideCsvSrc(*csvSourceFlag)
+	}
 }
