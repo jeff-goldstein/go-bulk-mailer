@@ -14,19 +14,26 @@ import (
 	"log"
 )
 
-const version  = "1.0"
+const version  = "0.1.0"
+const appName = "go-bulk-mailer"
 
-/**
-	TODO:
-	[ ] Success.log and Error.log are always empty
- */
-
+// TODO: Move flag logic to a separate function or a file
 func main() {
 	// Loaf fag details from command line arguments
+	versionFlag := flag.Bool("version", false, "Displays version and exist")
 	noDetailsFlag := flag.String("no-details", "no-value", "Do not print details for review.")
 	configFlag := flag.String("config", "no-value", "Path of config file")
 	noWarnFlag := flag.String("no-warning", "no-value", "Do warn if same source is already used for same campaign")
 	flag.Parse()
+
+	// If --version flag is set then just display version and exit
+	if(*versionFlag == true) {
+		// Display application name
+		fmt.Println(appName)
+		// Print version
+		fmt.Println("Version: " + version)
+		os.Exit(0)
+	}
 
 	if (*configFlag == "no-value") {
 		log.Fatal("Usage: ./go-bulk-mailer --config=/path/to/config.json")

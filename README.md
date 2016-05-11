@@ -89,15 +89,18 @@ And mail user following services
     }
 
 ## Development
-Pull request are always welcome. Application is made modular to make it easier 
-to add new sources and services. Currently I need support for csv as source 
-and mandrill as service. You are most welcome to add more services and sources.
+> Pull request are most welcome.  
+ 
+Currently I have implemented support for csv as source and sparkpost as service. 
+You are most welcome to add more services and sources.
 
 #### Todo
 1. Create test mode flag to send test email
 1. Implement support for sending attachment
 1. Daemon mode
 1. Generate sample config file
+1. create go get cli just like https://github.com/sideshow/apns2
+
 
 #### Folder structure
 `main.go` contains bootstapping code  
@@ -117,7 +120,9 @@ and mandrill as service. You are most welcome to add more services and sources.
 
 
 
+
 ## Changelog
 __v0.1 beta__
 This is first version
+
 
