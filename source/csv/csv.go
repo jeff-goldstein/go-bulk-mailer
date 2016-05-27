@@ -50,6 +50,8 @@ func Process(tpl_h, tpl_t string, ch chan common.Mail, wg *sync.WaitGroup) {
 		subject := config.Campaign.Subject
 		email, name, from_email, from_name := "", "", "", ""
 
+		tpl_h_tmp := tpl_h
+
 		// If variable exists in csv config
 		// Replace variable name in template by a field from csv
 		for i,v := range config.Source.Csv.Variables {
@@ -76,8 +78,11 @@ func Process(tpl_h, tpl_t string, ch chan common.Mail, wg *sync.WaitGroup) {
 					subject = val
 				}
 
-				tpl_h = strings.Replace(tpl_h, vname , val, -1)
-				if tpl_h != "" {
+				// Replace variables in template
+				tpl_h_tmp = strings.Replace(tpl_h_tmp, vname , val, -1)
+
+				// If text template is set, Replace variables in it
+				if tpl_t != "" {
 					tpl_t = strings.Replace(tpl_t, vname, val, -1)
 				}
 
@@ -111,7 +116,7 @@ func Process(tpl_h, tpl_t string, ch chan common.Mail, wg *sync.WaitGroup) {
 		}
 
 		m.Subject = subject
-		m.HTML = tpl_h
+		m.HTML = tpl_h_tmp
 		m.Text = tpl_t
 
 		ch <- m
