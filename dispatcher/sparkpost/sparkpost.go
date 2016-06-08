@@ -53,6 +53,9 @@ func Worker(conf config.Configuration, ch chan common.Mail, wg *sync.WaitGroup) 
 
 		tx := &sp.Transmission{}
 
+		// Add campaign detail from config to Transmission
+		tx.CampaignID = conf.Campaign.Title
+
 		// Add recipients to transmission
 		numEmails := 0
 		emails := []string{}
