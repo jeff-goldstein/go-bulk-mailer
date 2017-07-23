@@ -67,7 +67,7 @@ To send mail, create `config.json` file and run `./go-bulk-mailer --config=confi
         "use": "sparkpost",
     
         "sparkpost": {
-          "API_KEY": "***REMOVED***",
+          "API_KEY": "xxx",
           "base_url": "https://api.sparkpost.com",
           "api_version": 1
         },
